@@ -1287,9 +1287,13 @@ class YoutubeDL(object):
         subtitles = info_dict.get('subtitles')
         if subtitles:
             for _, subtitle in subtitles.items():
+
+                self.to_screen('All Subtitles: ')
                 for subtitle_format in subtitle:
                     if subtitle_format.get('url'):
+                        self.to_screen(subtitle_format['url'])
                         subtitle_format['url'] = sanitize_url(subtitle_format['url'])
+                        # self.to_screen('Subtitle Format: %s' % determine_ext(subtitle_format['url']).lower())
                     if 'ext' not in subtitle_format:
                         subtitle_format['ext'] = determine_ext(subtitle_format['url']).lower()
 
@@ -1491,7 +1495,7 @@ class YoutubeDL(object):
 
         reason = self._match_entry(info_dict, incomplete=False)
         if reason is not None:
-            self.to_screen('[download] ' + reason)
+            # self.to_screen('[download] ' + reason)
             return
 
         self._num_downloads += 1
@@ -1582,23 +1586,29 @@ class YoutubeDL(object):
                     sub_data = sub_info['data']
                 else:
                     try:
+                        self.to_screen("")
+                        self.to_screen('Default Subtitle:')
+                        self.to_screen(sub_info['url'])
+                        self.to_screen("")
+                        # self.to_screen('woo')
                         sub_data = ie._download_webpage(
                             sub_info['url'], info_dict['id'], note=False)
+                        return
                     except ExtractorError as err:
                         self.report_warning('Unable to download subtitle for "%s": %s' %
                                             (sub_lang, error_to_compat_str(err.cause)))
                         continue
-                try:
-                    sub_filename = subtitles_filename(filename, sub_lang, sub_format)
-                    if self.params.get('nooverwrites', False) and os.path.exists(encodeFilename(sub_filename)):
-                        self.to_screen('[info] Video subtitle %s.%s is already_present' % (sub_lang, sub_format))
-                    else:
-                        self.to_screen('[info] Writing video subtitles to: ' + sub_filename)
-                        with io.open(encodeFilename(sub_filename), 'w', encoding='utf-8') as subfile:
-                            subfile.write(sub_data)
-                except (OSError, IOError):
-                    self.report_error('Cannot write subtitles file ' + sub_filename)
-                    return
+                # try:
+                #     sub_filename = subtitles_filename(filename, sub_lang, sub_format)
+                #     if self.params.get('nooverwrites', False) and os.path.exists(encodeFilename(sub_filename)):
+                #         self.to_screen('[info] Video subtitle %s.%s is already_present' % (sub_lang, sub_format))
+                #     else:
+                #         self.to_screen('[info] Writing video subtitles to: ' + sub_filename)
+                #         with io.open(encodeFilename(sub_filename), 'w', encoding='utf-8') as subfile:
+                #             subfile.write(sub_data)
+                # except (OSError, IOError):
+                #     self.report_error('Cannot write subtitles file ' + sub_filename)
+                    # return
 
         if self.params.get('writeinfojson', False):
             infofn = replace_extension(filename, 'info.json', info_dict.get('ext'))
